@@ -10,6 +10,7 @@ class TikTokScraper:
         self.url = url
         self.id = None
         self.output = output
+        self.session = requests.session()  # Sử dụng session để quản lý cookie và yêu cầu
         self.vid_data = {}
     
     def check_url(self):
@@ -32,10 +33,15 @@ class TikTokScraper:
         headers = {
             "accept": "*/*",
             "accept-language": "vi,en;q=0.9,en-GB;q=0.8,en-US;q=0.7",
-            "cookie": "uid_tt=dd65444f6473ad0b0d126bc457c3bbf28a6aef607de47f79ab70b81b710e5319; sid_tt=eccf8f2ab526bd6c4122f25eb49ebfbb; sessionid=eccf8f2ab526bd6c4122f25eb49ebfbb; sessionid_ss=eccf8f2ab526bd6c4122f25eb49ebfbb",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0"
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0",
+            "Referer": "https://www.tiktok.com/",
+            "Accept-Encoding": "identity;q=1, *;q=0"
         }
-        response = requests.get(self.url, headers=headers)
+        cookies = {
+            'tt_webid': '1' * 19,
+            'tt_webid_v2': '1' * 19
+        }
+        response = self.session.get(self.url, headers=headers, cookies=cookies)
         soup = BeautifulSoup(response.text, "html.parser")
 
         vid_data = {
@@ -144,23 +150,26 @@ class TikTokScraper:
         headers = {
             "accept": "*/*",
             "accept-language": "vi,en;q=0.9,en-GB;q=0.8,en-US;q=0.7",
-            "cookie": "uid_tt=dd65444f6473ad0b0d126bc457c3bbf28a6aef607de47f79ab70b81b710e5319; sid_tt=eccf8f2ab526bd6c4122f25eb49ebfbb; sessionid=eccf8f2ab526bd6c4122f25eb49ebfbb; sessionid_ss=eccf8f2ab526bd6c4122f25eb49ebfbb",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0"
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0",
+            "Referer": "https://www.tiktok.com/",
+            "Range": "bytes=0-",
+            "Accept-Encoding": "identity;q=1, *;q=0"
+        }
+        cookies = {
+            'tt_webid': '1' * 19,
+            'tt_webid_v2': '1' * 19
         }
         
         try:
-            response = requests.get(self.video_url, headers=headers, stream=True)
-            if response.status_code == 200:
-                with open(file_path, 'wb') as f:
-                    for chunk in response.iter_content(chunk_size=8192):
-                        if chunk:
-                            f.write(chunk)
-                print(f"Đã tải thành công video tại: {file_path}")
-            else:
-                print(f"Lỗi khi tải video: Mã trạng thái {response.status_code}")
-        except Exception as e:
+            response = self.session.get(self.video_url, headers=headers, cookies=cookies)
+            response.raise_for_status()  # Kiểm tra mã trạng thái HTTP
+            with open(file_path, 'wb') as f:
+                f.write(response.content)  # Lưu toàn bộ nội dung video
+            print(f"Đã tải thành công video tại: {file_path}")
+        except requests.RequestException as e:
             print(f"Lỗi khi tải video: {e}")
-
+        except Exception as e:
+            print(f"Lỗi không xác định khi tải video: {e}")
 
 if __name__ == "__main__":
     a = 'https://www.tiktok.com/@jasminenguyen1998/video/7504965130900344071'
@@ -169,16 +178,4 @@ if __name__ == "__main__":
     b.get_information()
     b.save_2_json() 
     b.download()
-
-
-
-        
-
-        
-
-
-
-
-
-
 
