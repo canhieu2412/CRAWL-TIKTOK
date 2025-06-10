@@ -27,12 +27,10 @@ Script bao gồm một lớp `TikTokScraper` với các phương thức chính:
 ## Cách sử dụng
 1. **Chuẩn bị**: Đảm bảo bạn đã cài đặt các thư viện cần thiết và có một URL video TikTok hợp lệ.
 2. **Chạy script**:
-   - Tạo một instance của lớp `TikTokScraper` với URL video và (tuỳ chọn) thư mục đầu ra.
    - Gọi các phương thức theo thứ tự: `check_url()`, `get_information()`, `save_2_json()`, và `download()`.
 
    Ví dụ:
    ```python
-   from tiktok_scraper import TikTokScraper
 
    # URL video TikTok
    url = "https://www.tiktok.com/@jasminenguyen1998/video/7504965130900344071"
